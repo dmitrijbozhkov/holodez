@@ -1,0 +1,20 @@
+//created on: Apr 25, 2018
+package org.nure.rules
+
+//list any import classes here.
+
+
+
+//declare any global variables here
+
+
+
+
+rule "Split query string"
+
+    when
+        //conditions
+    then
+        //actions
+
+end
