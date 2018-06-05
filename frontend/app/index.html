@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html{{content-for 'thymeleaf'}}>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Frontend</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{content-for "head"}}
+    <link integrity="" rel="stylesheet" {{content-for 'vendor-css'}}>
+    <link integrity="" rel="stylesheet" {{content-for 'app-css'}}>
+    {{content-for "head-footer"}}
+  </head>
+  <body>
+    {{content-for "body"}}
+    <script {{content-for 'vendor-js'}}></script>
+    <script {{content-for 'app-js'}}></script>
+    {{content-for "body-footer"}}
+  </body>
+</html>

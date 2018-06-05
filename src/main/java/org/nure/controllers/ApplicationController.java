@@ -11,12 +11,8 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @RestController
 public class ApplicationController {
 	
-	@Value("${fuseki.address}")
-	public String path;
-	
 	private ModelAndView prepareMainView() {
-		ModelAndView mav = new ModelAndView("home");
-		mav.addObject("pepe", path);
+		ModelAndView mav = new ModelAndView("index");
 		return mav;
 	}
 	
