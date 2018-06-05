@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<kmodule xmlns="http://jboss.org/kie/7.7.0/kmodule"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <kbase name="QuweryProcessor" packages="org.nure.rules">
-    	<ksession name="QueryProcessingSession" type="stateless" default="true" />
-    </kbase>
-</kmodule>
