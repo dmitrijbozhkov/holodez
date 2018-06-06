@@ -1,0 +1,29 @@
+{{navbar-header}}
+<section class="hero is-fullheight">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                {{login-form}}
+                <div class="column is-6 is-offset-3">
+                    <h3 class="title has-text-grey">Войти</h3>
+                    <div class="box">
+                        <form {{action "submit" username password on="submit"}}>
+                            <div class="field">
+                                <div class="control">
+                                    {{input name='username' placeholder='Email' type="email" class="input is-large" value=username}}
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control">
+                                    {{input name='password' placeholder='Пароль' type="password" class="input is-large" value=password}}
+                                </div>
+                            </div>
+                            <button type="submit" class="button is-block is-info is-large is-fullwidth">Войти</button>
+                        </form>
+                    </div>
+                    <p class="has-text-grey">
+                        {{#link-to "register"}}&nbsp;·&nbsp; Зарегистрироваться &nbsp;·&nbsp;{{/link-to }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>

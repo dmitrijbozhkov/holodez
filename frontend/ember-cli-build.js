@@ -23,23 +23,24 @@ module.exports = function(defaults) {
                 enabled: false
             },
             inlineContent: {
-                "vendor-css": { content: "th:href='@{assets/vendor.css}'" },
-                "app-css": { content: "th:href='@{assets/holodez.css}'" },
-                "vendor-js": { content: "th:src='@{assets/vendor.js}'" },
-                "app-js": { content: "th:src='@{assets/holodez.js}'" },
+                "vendor-css": { content: "th:href='@{/css/vendor.css}'" },
+                "app-css": { content: "th:href='@{/css/holodez.css}'" },
+                "vendor-js": { content: "th:src='@{/js/vendor.js}'" },
+                "app-js": { content: "th:src='@{/js/holodez.js}'" },
                 "thymeleaf": { content: " xmlns:th='http://www.thymeleaf.org'" }
             }
           });
     } else { // ember build
         app = new EmberApp(defaults, {
             inlineContent: {
-                "vendor-css": { content: "href='assets/vendor.css'" },
-                "app-css": { content: "href='assets/holodez.css'" },
-                "vendor-js": { content: "src='assets/vendor.js'" },
-                "app-js": { content: "src='assets/holodez.js'" },
+                "vendor-css": { content: "href='/assets/vendor.css'" },
+                "app-css": { content: "href='/assets/frontend.css'" },
+                "vendor-js": { content: "src='/assets/vendor.js'" },
+                "app-js": { content: "src='/assets/frontend.js'" },
                 "thymeleaf": { content: "" }
             }
         });
     }
+    app.import("vendor/bulma.min.css");
   return app.toTree();
 };

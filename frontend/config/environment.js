@@ -23,6 +23,13 @@ module.exports = function(environment) {
     }
   };
 
+  ENV['ember-simple-auth-token'] = {
+    serverTokenEndpoint: '/api/auth/signin', // Server endpoint to send authenticate request
+    tokenPropertyName: 'token', // Key in server response that contains the access token
+    authorizationHeaderName: 'Authorization',
+    authorizationPrefix: 'Bearer-'
+  };
+
   if (environment === 'development') {
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;

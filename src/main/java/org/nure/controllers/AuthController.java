@@ -117,7 +117,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody CreateWorkerRequest signUpRequest) {
-        // check if user recordexists
+        // check if user record exists
     	if(userRepository.existsByUsername(signUpRequest.getUsername())) {
             return new ResponseEntity<ApiResponse>(new ApiResponse(false, "Username is already taken!"),
                     HttpStatus.BAD_REQUEST);

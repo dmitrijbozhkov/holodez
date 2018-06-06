@@ -1,19 +1,19 @@
 package org.nure.models.auth.ui;
 
 public class JwtAuthenticationResponse {
-    private String accessToken;
+    private String token;
     private String tokenType = "Bearer";
 
     public JwtAuthenticationResponse(String accessToken) {
-        this.accessToken = accessToken;
+        this.token = accessToken;
     }
 
-    public String getAccessToken() {
-        return accessToken;
+    public String getToken() {
+        return token;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
+    public void setToken(String accessToken) {
+        this.token = accessToken;
     }
 
     public String getTokenType() {
