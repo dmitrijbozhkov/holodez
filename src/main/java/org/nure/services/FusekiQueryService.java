@@ -13,42 +13,39 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class FusekiQueryService {
-
-	public FusekiQueryService() throws NoSuchAlgorithmException {
-		this.declarationsPrefix = "PREFIX dec: <http://holodez.org/diagnostics.owl/declarations#> ";
-		this.individualsPrefix = "PREFIX ind: <http://holodez/diagnostics.owl/individuals#> ";
-		this.rdfPrefix = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ";
-		this.owlPrefix = "PREFIX owl: <http://www.w3.org/2002/07/owl#> ";
-		this.xsdPrefix = "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>";
-		this.digester = MessageDigest.getInstance("MD5");
-		this.dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
-	}
 	
-	private final String declarationsPrefix;
-	private final String individualsPrefix;
-	private final String rdfPrefix;
-	private final String owlPrefix;
-	private final String xsdPrefix;
-	private final MessageDigest digester;
-	private final Format dateFormatter;
+	private final static String declarationsPrefix = "PREFIX dec: <http://holodez.org/diagnostics.owl/declarations#> ";
+	private final static String individualsPrefix = "PREFIX ind: <http://holodez/diagnostics.owl/individuals#> ";
+	private final static String rdfPrefix = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ";
+	private final static String owlPrefix = "PREFIX owl: <http://www.w3.org/2002/07/owl#> ";
+	private final static String xsdPrefix = "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>";
 	
+	// SPARQL queries
+	private static final String checkTypeQuery = "ASK { <ind:%1$s> rdf:type <dec:%2$s> }";
+	private static final String checkExistenceQuery = "ASK { <ind:%s> ?p ?o }";
+	
+	private static final String queryLimit = "LIMIT %s \r\n";
+	private static final String queryOffset = "OFFSET %s \r\n";
+		
 	public String prefixQuery(String query) {
 		return rdfPrefix + owlPrefix + xsdPrefix + declarationsPrefix + individualsPrefix + query;
 	}
 	
-	public String hexIdHash(String... strings) {
-		String result = String.join("", strings);
-		byte[] encodedResult;
-		try {
-			encodedResult = result.getBytes("UTF-8");
-		} catch (UnsupportedEncodingException ex) {
-			encodedResult = result.getBytes();
-		}
-		byte[] hash = digester.digest(encodedResult);
-		return Hex.encodeHexString(hash);
+	public String makeCheckTypeQuery(String id, String type) {
+		String checkQuery = String.format(checkTypeQuery, id, type);
+		return prefixQuery(checkQuery);
 	}
 	
-	public String dateToString(Date date) {
-		return dateFormatter.format(date);
+	public String makeCheckExistanceQuery(String name) {
+		String checkQuery = String.format(checkExistenceQuery, name);
+		return prefixQuery(checkQuery);
+	}
+	
+	public String setLimit(String query, int limit) {
+		return query + String.format(queryLimit, limit);
+	}
+	
+	public String setOffset(String query, int offset) {
+		return query + String.format(queryOffset, offset);
 	}
 }

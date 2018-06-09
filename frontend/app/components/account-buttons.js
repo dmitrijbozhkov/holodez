@@ -8,7 +8,7 @@ export default Component.extend({
     classNames: ["field", "is-grouped"],
     actions: {
         logout() {
-            this.get("auth").logout();
+            this.get("session").invalidate();
             this.get("router").transitionTo("index");
         }
     }

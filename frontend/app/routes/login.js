@@ -7,9 +7,8 @@ export default Route.extend({
     actions: {
         submit(username, password) {
             const credentials = { username: username, password: password };
-            const authenticator = 'authenticator:token'; // or 'authenticator:jwt'
-            console.log(this.get("session").get("isAuthenticated"))
-            this.get('session').authenticate(authenticator, credentials);
+            this.get("session").authenticate("authenticator:token", credentials);
+            this.transitionTo("index");
         }
     }
 });

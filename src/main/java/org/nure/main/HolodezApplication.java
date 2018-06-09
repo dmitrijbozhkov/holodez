@@ -1,7 +1,15 @@
 package org.nure.main;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.sql.DataSource;
 
+import org.nure.models.ontology.ICRUDOntologyAdapter;
+import org.nure.models.ontology.ISearchOntologyAdapter;
+import org.nure.ontology.adapters.patient.PatientAdapter;
+import org.nure.services.FusekiQueryService;
+import org.nure.services.FusekiRestService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -31,5 +39,18 @@ public class HolodezApplication {
 				.setType(EmbeddedDatabaseType.H2)
 				.build();
 		return db;
+	}
+	
+	@Bean
+	public Map<String, ISearchOntologyAdapter> searchAdapters(FusekiRestService restService) {
+		Map<String, ISearchOntologyAdapter> adapters = new HashMap<String, ISearchOntologyAdapter>();
+		adapters.put("patient", new PatientAdapter(restService));
+		return adapters;
+	}
+	
+	@Bean
+	public Map<String, ICRUDOntologyAdapter> crudAdapters(FusekiRestService restService) {
+		Map<String, ICRUDOntologyAdapter> adapters = new HashMap<String, ICRUDOntologyAdapter>();
+		return adapters;
 	}
 }
