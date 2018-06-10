@@ -67,7 +67,7 @@ INSERT DATA {
 	<dec:has_surname> '%7$s' ; 
 	<dec:has_patronymic> '%8$s' ; 
 	<dec:has_sex> 'female' ;
-	<dec:has_birthday> '%9$s'^^xsd:date ; 
+	<dec:has_birthday> '%9$s'^^xsd:date .
 <ind:%1$s> <dec:has_passport> <ind:%5$s> ;
 	<dec:has_anamnesis> <ind:%3$s> ;
 	<dec:has_menstruation> <ind:%4$s> .
@@ -83,7 +83,7 @@ INSERT DATA {
 	<dec:has_surname> '%6$s' ; 
 	<dec:has_patronymic> '%7$s' ; 
 	<dec:has_sex> 'male' ;
-	<dec:has_birthday> '%8$s'^^xsd:date ; 
+	<dec:has_birthday> '%8$s'^^xsd:date . 
 <ind:%1$s> <dec:has_passport> <ind:%4$s> ;
 	<dec:has_anamnesis> <ind:%3$s> ;
 }
@@ -145,7 +145,7 @@ public class PatientAdapter implements ISearchOntologyAdapter {
 			"	<dec:has_surname> '%7$s' ; \r\n" + 
 			"	<dec:has_patronymic> '%8$s' ; \r\n" + 
 			"	<dec:has_sex> 'female' ;\r\n" + 
-			"	<dec:has_birthday> '%9$s'^^xsd:date ; \r\n" + 
+			"	<dec:has_birthday> '%9$s'^^xsd:date .\r\n" + 
 			"<ind:%1$s> <dec:has_passport> <ind:%5$s> ;\r\n" + 
 			"	<dec:has_anamnesis> <ind:%3$s> ;\r\n" + 
 			"	<dec:has_menstruation> <ind:%4$s> .\r\n" + 
@@ -158,7 +158,7 @@ public class PatientAdapter implements ISearchOntologyAdapter {
 			"	<dec:has_surname> '%6$s' ; \r\n" + 
 			"	<dec:has_patronymic> '%7$s' ; \r\n" + 
 			"	<dec:has_sex> 'male' ;\r\n" + 
-			"	<dec:has_birthday> '%8$s'^^xsd:date ; \r\n" + 
+			"	<dec:has_birthday> '%8$s'^^xsd:date . \r\n" + 
 			"<ind:%1$s> <dec:has_passport> <ind:%4$s> ;\r\n" + 
 			"	<dec:has_anamnesis> <ind:%3$s> ;\r\n" + 
 			"}";
@@ -211,7 +211,7 @@ public class PatientAdapter implements ISearchOntologyAdapter {
 			"  FILTER(REGEX(CONCAT(?name, ?surname, ?patronymic), '%s', 'i'))\r\n" + 
 			"}";
 	
-	private IdClasses matchRole(String role) {
+	private IdClasses matchRoleClass(String role) {
 		if (RoleName.ROLE_PATIENT.match(role)) {
 			return IdClasses.PATIENT;
 		}
@@ -224,16 +224,15 @@ public class PatientAdapter implements ISearchOntologyAdapter {
 		throw new BadRequestException("No such role: " + role);
 	}
 	
-	private JSONMap generateEntities(IdClasses role, JSONMap body) {
+	private JSONMap generateEntities(JSONMap body) {
 		String id = restService.hexIdHash(body.get("name"),
 										  body.get("surname"),
 										  body.get("patronymic"),
 										  body.get("birthday"));
 		body.put("id", IdClasses.PATIENT.getAppendance() + id);
-		body.put("role", role.getOntologyClass());
 		body.put("anamnesis", IdClasses.PATIENT_ANAMNESIS.getAppendance() + id);
 		body.put("passport", IdClasses.PASSPORT.getAppendance() + id);
-		if (body.get("sex") == "female") {
+		if (body.get("sex").equals("female")) {
 			body.put("menstruation", IdClasses.MENSTRUATION.getAppendance() + id);
 		}
 		return body;
@@ -251,8 +250,7 @@ public class PatientAdapter implements ISearchOntologyAdapter {
 	@Override
 	public JSONMap parseCreate(String body) throws JsonParseException, JsonMappingException, IOException {
 		JSONMap request = restService.parseAsMap(body);
-		IdClasses role = matchRole(request.get("role"));
-		request = generateEntities(role, request);
+		request = generateEntities(request);
 		return request;
 		
 	}
@@ -262,10 +260,11 @@ public class PatientAdapter implements ISearchOntologyAdapter {
 		if (restService.checkExistance(request.get("id"))) {
 			throw new ExistsException("Patient already exists");
 		}
-		if (request.get("sex") == "male") {
+		String role = matchRoleClass(request.get("role")).getOntologyClass();
+		if (request.get("sex").equals("male")) {
 			String query = String.format(createMale,
 										 request.get("id"),
-										 request.get("role"),
+										 role,
 										 request.get("anamnesis"),
 										 request.get("passport"),
 										 request.get("name"),
@@ -273,10 +272,10 @@ public class PatientAdapter implements ISearchOntologyAdapter {
 										 request.get("patronymic"),
 										 request.get("birthday"));
 			return manageCreate(query, request.get("id"));
-		} else if (request.get("sex") == "female") {
+		} else if (request.get("sex").equals("female")) {
 			String query = String.format(createFemale, 
 										 request.get("id"),
-										 request.get("role"),
+										 role,
 										 request.get("anamnesis"),
 										 request.get("menstruation"),
 										 request.get("passport"),
@@ -319,7 +318,7 @@ public class PatientAdapter implements ISearchOntologyAdapter {
 	}
 	
 	public String promotePatient(JSONMap values) {
-		IdClasses patientType = matchRole(values.get("role"));
+		IdClasses patientType = matchRoleClass(values.get("role"));
 		String promoteQuery = String.format(promotePatientQuery,
 											values.get("id"),
 											patientType.getClass());

@@ -26,6 +26,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
+
 @ControllerAdvice
 public class ExceptionResolverController extends ResponseEntityExceptionHandler {
 
@@ -63,5 +68,12 @@ public class ExceptionResolverController extends ResponseEntityExceptionHandler 
 		return constructError(ex, HttpStatus.BAD_REQUEST);
 	}
 
-
+	@ExceptionHandler(value = { SignatureException.class,
+								MalformedJwtException.class,
+								ExpiredJwtException.class,
+								UnsupportedJwtException.class,
+								IllegalArgumentException.class})
+	protected ResponseEntity<?> jwtValidationError(RuntimeException ex, WebRequest request) {
+		return constructError(ex, HttpStatus.UNAUTHORIZED);
+	}
 }

@@ -12,6 +12,6 @@ public enum RoleName {
 	}
 	
 	public boolean match(String role) {
-		return patientRole == role;
+		return patientRole.equals(role);
 	}
 }

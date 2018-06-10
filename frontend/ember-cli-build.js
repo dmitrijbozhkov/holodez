@@ -1,9 +1,11 @@
 "use strict";
 
 const EmberApp = require("ember-cli/lib/broccoli/ember-app");
+var fs = require('fs');
 
 module.exports = function(defaults) {
     let app;
+    let imgDir = "../src/main/resources/static/images";
     if (process.env.EMBER_ENV === "production") { // ember build --output-path="../src/main/resources" --environment="production"
         app = new EmberApp(defaults, {
             outputPaths: {
@@ -30,6 +32,9 @@ module.exports = function(defaults) {
                 "thymeleaf": { content: " xmlns:th='http://www.thymeleaf.org'" }
             }
           });
+        if (!fs.existsSync(imgDir)){
+            fs.mkdirSync(imgDir);
+        }
     } else { // ember build
         app = new EmberApp(defaults, {
             inlineContent: {

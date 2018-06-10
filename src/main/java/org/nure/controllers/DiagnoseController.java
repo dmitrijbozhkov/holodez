@@ -24,4 +24,9 @@ public class DiagnoseController {
 	public ResponseEntity<?> firstAidDiagnostic(@Valid @RequestBody FirstAidQuery query) {
 		return ResponseEntity.ok(ruleQueryService.processFirstAid(query));
 	}
+	
+	@PostMapping("/case-update")
+	public ResponseEntity<?> caseUpdateDiagnostic(@Valid @RequestBody FirstAidQuery query) {
+		return ResponseEntity.ok(ruleQueryService.processFirstAid(query));
+	}
 }

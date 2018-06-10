@@ -1,2 +1,51 @@
 {{navbar-header}}
-{{outlet}}
+<section class="hero is-fullheight">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            {{login-form}}
+            <div class="column is-6 is-offset-3">
+                <h3 class="title has-text-grey">Зарегистрироваться</h3>
+                <div class="box">
+                    <form {{action "submit" on="submit"}}>
+                        {{#form-control}}
+                            {{input name='username' placeholder='Email' type="email" class="input is-large" value=model.form.username required=true}}
+                        {{/form-control}}
+                        {{#form-control help="Пароль должен содержать минимум 8 латинских букв верхнего и нижнего регистра и цифры без пробелов"}}
+                            {{input name='password' placeholder='Пароль' type="password" class="input is-large" value=model.form.password pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" required=true}}
+                        {{/form-control}}
+                        {{#form-select size="is-large" label="Работаю:"}}
+                            <select value={{model.form.role}} onchange={{action (mut model.form.role) value="target.value"}}>
+                                {{#each model.roles as |role|}}
+                                    <option value={{role.id}}>{{role.name}}</option>
+                                {{/each}}
+                            </select>
+                        {{/form-select}}
+                        {{#form-control}}
+                            {{input name='name' placeholder='Имя' class="input is-large" value=model.form.name required=true}}
+                        {{/form-control}}
+                        {{#form-control}}
+                            {{input name='surname' placeholder='Фамилия' class="input is-large" value=model.form.surname required=true}}
+                        {{/form-control}}
+                        {{#form-control}}
+                            {{input name='patronymic' placeholder='Отчество' class="input is-large" value=model.form.patronymic required=true}}
+                        {{/form-control}}
+                        {{#form-select size="is-large" label="Пол:"}}
+                            <select value={{model.form.sex}} onchange={{action (mut model.form.sex) value="target.value"}}>
+                                {{#each model.sexes as |sex|}}
+                                    <option value={{sex.id}}>{{sex.name}}</option>
+                                {{/each}}
+                            </select>
+                        {{/form-select}}
+                        {{#form-control label="День рождения:"}}
+                            {{input name='Birthday' placeholder='День рождения' class="input is-large" value=model.form.birthday type="date" required=true}}
+                        {{/form-control}}
+                        <button type="submit" class="button is-block is-info is-large is-fullwidth">Зарегистрироваться</button>
+                    </form>
+                </div>
+                <p class="has-text-grey">
+                    {{#link-to "login"}}&nbsp;·&nbsp; Войти &nbsp;·&nbsp;{{/link-to }}
+                </p>
+            </div>
+        </div>
+    </div>
+</section>

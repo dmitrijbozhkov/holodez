@@ -7,7 +7,11 @@ export default Route.extend({
     actions: {
         submit(username, password) {
             const credentials = { username: username, password: password };
-            this.get("session").authenticate("authenticator:token", credentials);
+            try {
+                this.get("session").authenticate("authenticator:token", credentials);
+            } catch (ex) {
+                console.log(ex);
+            }
             this.transitionTo("index");
         }
     }
