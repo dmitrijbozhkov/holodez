@@ -5,11 +5,14 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.nure.models.ontology.ICRUDFileOntologyAdapter;
 import org.nure.models.ontology.ICRUDOntologyAdapter;
+import org.nure.models.ontology.ISearchFileOntologyAdapter;
 import org.nure.models.ontology.ISearchOntologyAdapter;
 import org.nure.ontology.adapters.patient.PatientAdapter;
 import org.nure.services.FusekiQueryService;
 import org.nure.services.FusekiRestService;
+import org.nure.services.ImageService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -44,13 +47,25 @@ public class HolodezApplication {
 	@Bean
 	public Map<String, ISearchOntologyAdapter> searchAdapters(FusekiRestService restService) {
 		Map<String, ISearchOntologyAdapter> adapters = new HashMap<String, ISearchOntologyAdapter>();
-		adapters.put("patient", new PatientAdapter(restService));
 		return adapters;
 	}
 	
 	@Bean
 	public Map<String, ICRUDOntologyAdapter> crudAdapters(FusekiRestService restService) {
 		Map<String, ICRUDOntologyAdapter> adapters = new HashMap<String, ICRUDOntologyAdapter>();
+		return adapters;
+	}
+	
+	@Bean
+	public Map<String, ISearchFileOntologyAdapter> searchFileAdapters(FusekiRestService restService, ImageService imageService) {
+		Map<String, ISearchFileOntologyAdapter> adapters = new HashMap<String, ISearchFileOntologyAdapter>();
+		adapters.put("patient", new PatientAdapter(restService, imageService));
+		return adapters;
+	}
+	
+	@Bean
+	public Map<String, ICRUDFileOntologyAdapter> crudFileAdapters(FusekiRestService restService, ImageService imageService) {
+		Map<String, ICRUDFileOntologyAdapter> adapters = new HashMap<String, ICRUDFileOntologyAdapter>();
 		return adapters;
 	}
 }

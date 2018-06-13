@@ -14,13 +14,17 @@ import org.nure.exceptions.ExistsException;
 import org.nure.models.auth.RoleName;
 import org.nure.models.fuseki.Binding;
 import org.nure.models.fuseki.SelectResponse;
+import org.nure.models.ontology.ISearchFileOntologyAdapter;
 import org.nure.models.ontology.ISearchOntologyAdapter;
 import org.nure.models.ontology.JSONMap;
+import org.nure.models.ui.ImageModel;
 import org.nure.services.FusekiQueryService;
 import org.nure.services.FusekiRestService;
+import org.nure.services.ImageService;
 import org.nure.services.ontology.IdClasses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.nure.models.auth.RoleName;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -67,7 +71,8 @@ INSERT DATA {
 	<dec:has_surname> '%7$s' ; 
 	<dec:has_patronymic> '%8$s' ; 
 	<dec:has_sex> 'female' ;
-	<dec:has_birthday> '%9$s'^^xsd:date .
+	<dec:has_birthday> '%9$s'^^xsd:date ;
+	<dec:has_photo> '%10$s' .
 <ind:%1$s> <dec:has_passport> <ind:%5$s> ;
 	<dec:has_anamnesis> <ind:%3$s> ;
 	<dec:has_menstruation> <ind:%4$s> .
@@ -83,7 +88,8 @@ INSERT DATA {
 	<dec:has_surname> '%6$s' ; 
 	<dec:has_patronymic> '%7$s' ; 
 	<dec:has_sex> 'male' ;
-	<dec:has_birthday> '%8$s'^^xsd:date . 
+	<dec:has_birthday> '%8$s'^^xsd:date ;
+	<dec:has_photo> '%10$s' .
 <ind:%1$s> <dec:has_passport> <ind:%4$s> ;
 	<dec:has_anamnesis> <ind:%3$s> ;
 }
@@ -126,14 +132,16 @@ WHERE {
 TODO
  */
 
-public class PatientAdapter implements ISearchOntologyAdapter {
+public class PatientAdapter implements ISearchFileOntologyAdapter {
 
-	public PatientAdapter(FusekiRestService restService) {
+	public PatientAdapter(FusekiRestService restService, ImageService imageService) {
 		super();
 		this.restService = restService;
+		this.imageService = imageService;
 	}
 	
 	private final FusekiRestService restService;
+	private final ImageService imageService;
 	
 	private final static int pageSize = 6;
 	private final static String createFemale = "INSERT DATA {\r\n" + 
@@ -248,15 +256,16 @@ public class PatientAdapter implements ISearchOntologyAdapter {
 	}
 	
 	@Override
-	public JSONMap parseCreate(String body) throws JsonParseException, JsonMappingException, IOException {
-		JSONMap request = restService.parseAsMap(body);
-		request = generateEntities(request);
+	public ImageModel parseCreate(String body) throws JsonParseException, JsonMappingException, IOException {
+		ImageModel request = restService.parseAsImageModel(body);
+		generateEntities(request.getData());
 		return request;
 		
 	}
 	
 	@Override
-	public String createRecord(JSONMap request) throws ExistsException {
+	public String createRecord(ImageModel imageRequest) throws ExistsException {
+		JSONMap request = imageRequest.getData();
 		if (restService.checkExistance(request.get("id"))) {
 			throw new ExistsException("Patient already exists");
 		}
@@ -270,7 +279,8 @@ public class PatientAdapter implements ISearchOntologyAdapter {
 										 request.get("name"),
 										 request.get("surname"),
 										 request.get("patronymic"),
-										 request.get("birthday"));
+										 request.get("birthday"),
+										 request.get("photo"));
 			return manageCreate(query, request.get("id"));
 		} else if (request.get("sex").equals("female")) {
 			String query = String.format(createFemale, 
@@ -282,7 +292,8 @@ public class PatientAdapter implements ISearchOntologyAdapter {
 										 request.get("name"),
 										 request.get("surname"),
 										 request.get("patronymic"),
-										 request.get("birthday"));
+										 request.get("birthday"),
+										 request.get("photo"));
 			return manageCreate(query, request.get("id"));
 		} else {
 			throw new BadRequestException("'sex' field should be 'male' of 'female'");
@@ -290,12 +301,13 @@ public class PatientAdapter implements ISearchOntologyAdapter {
 	}
 	
 	@Override
-	public JSONMap parseEdit(String body) throws JsonParseException, JsonMappingException, IOException {
-		return restService.parseAsMap(body);
+	public ImageModel parseEdit(String body) throws JsonParseException, JsonMappingException, IOException {
+		return restService.parseAsImageModel(body);
 	}
 
 	@Override
-	public String editRecord(String id, JSONMap request) {
+	public String editRecord(String id, ImageModel imageRequest) {
+		JSONMap request = imageRequest.getData();
 		String query = String.format(editPatient,
 									 id,
 									 request.get("name"),

@@ -6,10 +6,12 @@ import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.codec.binary.Hex;
 import org.nure.exceptions.AppException;
@@ -18,6 +20,7 @@ import org.nure.models.fuseki.Binding;
 import org.nure.models.fuseki.SelectResponse;
 import org.nure.models.fuseki.Vars;
 import org.nure.models.ontology.JSONMap;
+import org.nure.models.ui.ImageModel;
 import org.nure.services.ontology.IdClasses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -116,6 +119,11 @@ public class FusekiRestService {
 		return mapper.readValue(encoded, JSONMap.class);
 	}
 	
+	public ImageModel parseAsImageModel(String encoded) throws JsonParseException, JsonMappingException, IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		return mapper.readValue(encoded, ImageModel.class);
+	}
+	
 	public String hexIdHash(String... strings) {
 		String result = String.join("", strings);
 		byte[] encodedResult;
@@ -128,16 +136,21 @@ public class FusekiRestService {
 		return Hex.encodeHexString(hash);
 	}
 	
-	public Map<String, String> selectResponseValues(SelectResponse response) {
-		Map<String, Binding> bindings = response.getResults().getBindings().iterator().next();
-		Map<String, String> values = new HashMap<String, String>();
-		for(String key : bindings.keySet()) {
-			values.put(key, bindings.get(key).getValue());
+	public List<Map<String, String>> selectResponseValues(SelectResponse response) {
+		Collection<Map<String, Binding>> bindings = response.getResults().getBindings();
+		List<Map<String, String>> values = new ArrayList<Map<String, String>>();
+		Map<String, String> row;
+		for(Map<String, Binding> item : bindings) {
+			row = new HashMap<String, String>();
+			for(String key : item.keySet()) {
+				row.put(key, item.get(key).getValue());
+			}
+			values.add(row);
 		}
 		return values;
 	}
 	
-	public String JSONIfyMap(Map<String, String> values) throws JsonProcessingException  {
+	public String JSONIfyMap(Map<String, List<Map<String, String>>> values) throws JsonProcessingException  {
 		ObjectMapper mapper = new ObjectMapper();
 		return mapper.writeValueAsString(values);
 	}
@@ -148,7 +161,9 @@ public class FusekiRestService {
 			throw new AppException("Action failed with code: " + response.getStatusCodeValue() + " and body: " + response.getBody());
 		}
 		SelectResponse parsedResponse = parseSelect(response.getBody());
-		Map<String, String> values = selectResponseValues(parsedResponse);
+		List<Map<String, String>> vals = selectResponseValues(parsedResponse);
+		Map<String, List<Map<String, String>>> values = new HashMap<String, List<Map<String, String>>>();
+		values.put("data", vals);
 		return JSONIfyMap(values);
 	}
 	

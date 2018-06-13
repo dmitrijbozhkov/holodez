@@ -8,5 +8,6 @@ export default DS.Model.extend({
     surname: DS.attr("string"),
     patronymic: DS.attr("string"),
     sex: DS.attr("string"),
-    birthday: DS.attr("date")
+    birthday: DS.attr("date"),
+    image: DS.attr()
 });

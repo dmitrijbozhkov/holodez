@@ -17,9 +17,11 @@ import org.nure.models.auth.ui.ApiResponse;
 import org.nure.models.auth.ui.JwtAuthenticationResponse;
 import org.nure.models.auth.ui.LoginRequest;
 import org.nure.models.auth.ui.PatientCreatedResponse;
+import org.nure.models.ontology.ISearchFileOntologyAdapter;
 import org.nure.models.ontology.ISearchOntologyAdapter;
 import org.nure.models.ontology.JSONMap;
 import org.nure.models.ontology.patient.Passport;
+import org.nure.models.ui.ImageModel;
 import org.nure.ontology.adapters.patient.PatientAdapter;
 import org.nure.repositories.AccountRepository;
 import org.nure.repositories.RoleRepository;
@@ -40,12 +42,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
 	@Autowired
-	public AuthController(Map<String, ISearchOntologyAdapter> searchAdapters) {
+	public AuthController(Map<String, ISearchFileOntologyAdapter> searchAdapters) {
 		patientAdapter = (PatientAdapter) searchAdapters.get("patient");
 	}
 	
@@ -101,13 +106,9 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody String body) {
-    	JSONMap values;
-		try {
-			values = patientAdapter.parseCreate(body);
-		} catch (IOException ex) {
-			throw new AppException("Couldn't read data, error: " + ex.getMessage());
-		}
+    public ResponseEntity<?> registerUser(@RequestBody String body) throws JsonParseException, JsonMappingException, IOException {
+    	ImageModel model = patientAdapter.parseCreate(body);
+    	JSONMap values = model.getData();
     	validatePassword(values.get("password"));
     	if(userRepository.existsByUsername(values.get("username"))) {
             throw new BadRequestException("Username is already taken");
@@ -121,7 +122,7 @@ public class AuthController {
         userRepository.save(user);
         String uri;
         try {
-        	uri = patientAdapter.createRecord(values);
+        	uri = patientAdapter.createRecord(model);
         } catch (ExistsException ex) {
         	uri = patientAdapter.promotePatient(values);
         }
